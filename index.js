@@ -4,6 +4,7 @@ var falafel = require('falafel')
 var strescape = require('jsesc')
 var path = require('path')
 var fs = require('fs')
+var uglifyJs = require('uglify-js')
 
 module.exports = function(file) {
   if (!/\.(js|coffee)$/.test(file)) return through()
@@ -51,7 +52,8 @@ module.exports = function(file) {
         self.emit('file', resolvedFile)
 
         bfy(resolvedFile, function(err, data) {
-          node.update(makeBlob(data, withWorker))
+          var uglified = uglifyJs.minify(data, {fromString: true}).code
+          node.update(makeBlob(uglified, withWorker))
           done()
         })
       }
